@@ -13,7 +13,7 @@ graph = {
         'C':{'D':120, 'R':146, 'P':138},
         'P':{'R': 97, 'C': 138, 'B':110},
         'G':{'B': 90},
-        'B':{'G': 90, 'B':110, 'F':211, 'U':85},
+        'B':{'G': 90, 'P':110, 'F':211, 'U':85},
         'U':{'B':85, 'V':142, 'H':98},
         'N':{'I':87},
         'H':{'U': 98, 'E':86},
@@ -47,6 +47,57 @@ heuristic = {
         }
 
 FAILURE = 'failure'
+DEST = 'B'
+     
+# frontier sap xep tang dan(khi pop() se lay phan tu cuoi cung)
+def addToFrontier(frontier:list, node:str):
+    frontier.append(node)
 
-def GreedyBestFirstSearch(graph:dict, start:str, dest:str):
-    pass
+    #duyet tu n-1 den 1
+    for i  in range(len(frontier)-1, 0, -1):
+        if(heuristic[frontier[i]] > heuristic[frontier[i-1]]):
+                #swap
+                frontier[i-1], frontier[i] = frontier[i], frontier[i-1]
+        else:
+             break
+
+# Tim duong di tu start->B
+def GreedyBestFirstSearch(graph:dict, start:str):
+    explored = []
+    frontier = []
+
+    # dict luu key=node, value=node truoc
+    previous = {}
+
+    addToFrontier(frontier=frontier, node=start)
+    while(len(frontier) != 0):
+        print("")
+        node = frontier.pop()
+        
+        if(node == DEST):
+            print(previous)
+            moves = []
+            moves.append(node)
+            print("find back", node)
+            while(node != start):
+                print("find back", node)
+                node = previous[node]
+                moves.append(node)
+            return moves 
+        
+
+        if(not(node in explored)):
+             explored.append(node)
+             for childNode in graph[node].keys():
+                  if((not childNode in frontier) and (not childNode in explored)):
+                       addToFrontier(frontier=frontier, node=childNode)
+                       previous[childNode] = node
+        print("debug, node = ", node)
+        ls = [(i, heuristic[i]) for i in frontier ]
+        print("frontier = ", ls)
+    return FAILURE
+    
+start = input("Start point: ")
+# dest = input("Destination point: ")
+
+print("=>", GreedyBestFirstSearch(graph=graph, start=start))
